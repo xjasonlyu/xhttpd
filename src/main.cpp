@@ -1,18 +1,19 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <fcntl.h>
-#include <stdlib.h>
 #include <cassert>
+#include <errno.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/epoll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
+#include "http_conn.h"
 #include "locker.h"
 #include "threadpool.h"
-#include "http_conn.h"
 
 #define MAX_FD 65536
 #define MAX_EVENT_NUMBER 10000
@@ -21,7 +22,7 @@ extern int addfd(int epollfd, int fd, bool one_shot);
 
 extern int removefd(int epollfd, int fd);
 
-void addsig(int sig, void( handler )(int), bool restart = true) {
+void addsig(int sig, void(handler)(int), bool restart = true) {
     struct sigaction sa;
     memset(&sa, '\0', sizeof(sa));
     sa.sa_handler = handler;
@@ -38,13 +39,12 @@ void show_error(int connfd, const char *info) {
     close(connfd);
 }
 
-
 int main(int argc, char *argv[]) {
     if (argc <= 1) {
         printf("usage: %s ip_address port_number\n", basename(argv[0]));
         return 1;
     }
-//    const char* ip = argv[1];
+    //    const char* ip = argv[1];
     int port = atoi(argv[1]);
 
     addsig(SIGPIPE, SIG_IGN);
@@ -52,8 +52,7 @@ int main(int argc, char *argv[]) {
     threadpool<http_conn> *pool = NULL;
     try {
         pool = new threadpool<http_conn>;
-    }
-    catch (...) {
+    } catch (...) {
         return 1;
     }
 
@@ -73,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     int flag = 1;
     setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
-    ret = bind(listenfd, (struct sockaddr *) &address, sizeof(address));
+    ret = bind(listenfd, (struct sockaddr *)&address, sizeof(address));
     assert(ret >= 0);
 
     ret = listen(listenfd, 20);
@@ -97,7 +96,7 @@ int main(int argc, char *argv[]) {
             if (sockfd == listenfd) {
                 struct sockaddr_in client_address;
                 socklen_t client_addrlength = sizeof(client_address);
-                int connfd = accept(listenfd, (struct sockaddr *) &client_address, &client_addrlength);
+                int connfd = accept(listenfd, (struct sockaddr *)&client_address, &client_addrlength);
                 if (connfd < 0) {
                     printf("errno is: %d\n", errno);
                     continue;
@@ -120,7 +119,8 @@ int main(int argc, char *argv[]) {
                 if (!users[sockfd].write()) {
                     users[sockfd].close_conn();
                 }
-            } else {}
+            } else {
+            }
         }
     }
 

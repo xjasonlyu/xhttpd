@@ -347,6 +347,7 @@ bool http_conn::add_headers(int content_len) {
     add_content_length(content_len);
     add_linger();
     add_blank_line();
+    return true;
 }
 
 bool http_conn::add_content_length(int content_len) {
