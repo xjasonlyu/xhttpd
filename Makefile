@@ -1,13 +1,19 @@
-BIN_DIR = bin
 NAME = xhttpd
 
-FILES += main.cpp
-FILES += http_conn.cpp
+BIN_DIR = bin
+SRC_DIR = src
+INCLUDE = include
 
-BUILD = g++ -o $(BIN_DIR)/$(NAME) $(FILES) -lpthread -std=c++11
+FILES += $(SRC_DIR)/main.cpp
+FILES += $(SRC_DIR)/http_conn.cpp
 
-all:
-	$(BUILD)
+all: dependency build
+
+dependency:
+	mkdir -p $(BIN_DIR)
+
+build:
+	g++ -o $(BIN_DIR)/$(NAME) $(FILES) -I$(INCLUDE) -lpthread -std=c++11
 
 clean:
 	rm $(BIN_DIR)/*
