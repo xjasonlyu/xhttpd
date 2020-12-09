@@ -4,8 +4,9 @@ BIN_DIR = bin
 SRC_DIR = src
 INCLUDE = include
 
+FILES += $(SRC_DIR)/http.cpp
 FILES += $(SRC_DIR)/main.cpp
-FILES += $(SRC_DIR)/http_conn.cpp
+FILES += $(SRC_DIR)/mutex.cpp
 
 all: dependency build
 
